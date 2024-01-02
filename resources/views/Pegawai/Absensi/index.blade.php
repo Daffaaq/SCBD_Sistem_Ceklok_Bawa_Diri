@@ -94,6 +94,7 @@
             // Menangani perubahan dalam dropdown
             attendanceTypeSelect.addEventListener('change', function() {
                 toggleSections(attendanceTypeSelect.value, attendanceStatusSelect.value);
+                getLocationAndDisplayOnMap(map);
             });
 
             attendanceStatusSelect.addEventListener('change', function() {
@@ -209,12 +210,18 @@
                 document.querySelector('select[name="attendance_type"]').value = ''; // Reset nilai attendance_type
                 return;
             }
-
+            // if (selectedType === 'onsite') {
+            //     document.getElementById('longitude_attendences').value = ''; // Reset nilai longitude
+            //     document.getElementById('latitude_attendences').value = ''; // Reset nilai latitude
+            //     return;
+            // }
             if (selectedStatus === 'hadir') {
                 attendanceTypeInputSection.style.display = 'block';
                 if (selectedType === 'onsite') {
-                    // Menunjukkan bagian peta untuk onsite
-                    mapInputSection.style.display = 'none';
+                    document.getElementById('longitude_attendences').value = ''; // Reset nilai longitude
+                    document.getElementById('latitude_attendences').value = ''; // Reset nilai latitude
+                    mapInputSection.style.display = 'none'; // Ubah menjadi 'block'
+                    fileInputSection.style.display = 'none';
                 } else if (selectedType === 'online') {
                     // Menunjukkan bagian file untuk online
                     fileInputSection.style.display = 'block';
@@ -239,6 +246,11 @@
                 updateMapSize();
             }, 1000);
 
+            if (selectedStatus !== 'hadir' || selectedType !== 'online') {
+                if (watchId) {
+                    navigator.geolocation.clearWatch(watchId);
+                }
+            }
             if (selectedStatus === 'hadir' || selectedType === 'online') {
                 enableLiveLocation();
             }
