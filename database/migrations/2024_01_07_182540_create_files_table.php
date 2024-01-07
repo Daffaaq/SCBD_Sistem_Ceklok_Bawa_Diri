@@ -18,7 +18,8 @@ return new class extends Migration
             $table->string('name');
             $table->string('path');
             $table->string('criteria_file');
-            $table->string('target_type')->nullable();
+            $table->string('target_type');
+            $table->string('target_id')->nullable();
             $table->date('file_date_created');
             $table->time('file_time_created');
             $table->timestamps();

@@ -48,7 +48,8 @@ Route::middleware(['auth', 'check.role:superadmin'])->prefix('superadmin')->grou
     });
 });
 Route::middleware(['auth', 'check.role:pegawai'])->prefix('pegawai')->group(function () {
-    Route::get('/', [DashboardPegawaiController::class, 'ViewPegawai'])->name('pegawai.dashboard');
+    // Route::get('/', [DashboardPegawaiController::class, 'ViewPegawai'])->name('pegawai.dashboard');
+    Route::get('/', [FileController::class, 'indexPegawai'])->name('pegawai.dashboard');
     Route::prefix('/')->group(function () {
         Route::get('/absensi', [AttendenceController::class, 'index']);
         Route::post('/absensi/store', [AttendenceController::class, 'store']);
@@ -57,6 +58,9 @@ Route::middleware(['auth', 'check.role:pegawai'])->prefix('pegawai')->group(func
         Route::get('/rekap', [AttendenceController::class, 'recapAttendence']);
         Route::get('/rekap/data', [AttendenceController::class, 'getRecapAttendence'])->name('get.recap.attendance');
         Route::delete('/rekap/delete/{id}', [AttendenceController::class, 'destroy']);
+    });
+    Route::prefix('/')->group(function () {
+        Route::get('/Files/private/files/{id}', [FileController::class, 'serveFile'])->name('files.serve');
     });
 });
 
@@ -67,5 +71,8 @@ Route::middleware(['auth', 'check.role:kasubag'])->prefix('kasubag')->group(func
         Route::get('/Rekap_absensi/data', [KasubagAttendence::class, 'json'])->name('get.recap.attendance.kasubag');
         Route::get('/accept/{id}', [KasubagAttendence::class, 'acceptAttendance'])->name('attendances.accept');
         Route::get('/reject/{id}', [KasubagAttendence::class, 'rejectAttendance'])->name('attendances.reject');
+    });
+    Route::prefix('/')->group(function () {
+        Route::get('/Files/private/files/{id}', [FileController::class, 'serveFile'])->name('files.serve');
     });
 });

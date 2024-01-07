@@ -7,6 +7,7 @@ use Yajra\DataTables\DataTables;
 use Illuminate\Support\Facades\Storage;
 use App\Models\User;
 use App\Models\file;
+use Illuminate\Support\Facades\Auth;
 
 class FileController extends Controller
 {
@@ -19,6 +20,37 @@ class FileController extends Controller
 
         return view('Admin.Files.index', compact('jabatans'));
     }
+    public function indexPegawai(Request $request)
+{
+    // Ambil data jabatan dari tabel user dengan role selain superadmin
+    $jabatans = User::where('role', '!=', 'superadmin')
+        ->select('jabatan')
+        ->distinct()
+        ->get();
+
+    // Identifikasi pengguna yang sedang login
+    $loggedInUser = Auth::user();
+
+    // Ambil daftar file sesuai dengan jabatan pengguna yang sedang login
+    $files = File::when($request->input('target_type') === 'specific', function ($query) use ($request) {
+    return $query->where('target_id', $request->input('target_id'));
+})->when($request->input('target_type') === 'general', function ($query) use ($loggedInUser) {
+    return $query->where('target_type', 'general')
+        ->orWhere(function ($query) use ($loggedInUser) {
+            $query->where('target_type', 'specific')
+                ->where('target_id', $loggedInUser->jabatan);
+        });
+})->get();
+
+
+    $filteredFiles = $files->filter(function ($file) use ($loggedInUser) {
+    return $file->target_type == 'general' || ($file->target_type == 'specific' && $file->target_id == $loggedInUser->jabatan);
+});
+
+
+    return view('Pegawai.Dashboard.index', compact('jabatans', 'filteredFiles'));
+}
+
 
     public function json(){
         $files = File::all();
@@ -42,19 +74,19 @@ class FileController extends Controller
             ]);
 
             $file = $request->file('file');
-            $fileName = time() . '.' . $file->getClientOriginalExtension();
-
-            $path = $file->storeAs('private/files', $fileName, 'local');
+$fileName = $file->getClientOriginalName(); // Dapatkan nama asli file
+$path = $file->storeAs('private/files', $fileName, 'local');
 
             $fileRecord = File::create([
-                'name' => $fileName,
+                'name' =>  $fileName,
                 'path' => $path,
                 'criteria_file' => $request->criteria_file,
                 'file_date_created' => now()->toDateString(),
                 'file_time_created' => now()->toTimeString(),
-                'target_type' => $request->target_type,
+                'target_type' => $request->input('target_type'),
                 'target_id' => ($request->target_type === 'specific') ? $request->target_id : null,
             ]);
+            // dd($request->all());
             // Mengembalikan respons JSON sukses
             return redirect('/superadmin/Files')->with('success', 'File uploaded successfully');
         } catch (\Exception $e) {

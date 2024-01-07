@@ -9,6 +9,6 @@ class file extends Model
 {
     use HasFactory;
 
-     protected $fillable = ['name', 'path','criteria_file','file_date_created','file_time_created']; // Add other fillable columns if needed
+     protected $fillable = ['name', 'path','criteria_file','target_type','target_id','file_date_created','file_time_created']; // Add other fillable columns if needed
 
 }
