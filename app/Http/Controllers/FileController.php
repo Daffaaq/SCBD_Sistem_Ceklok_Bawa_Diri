@@ -56,7 +56,7 @@ class FileController extends Controller
                 'target_id' => ($request->target_type === 'specific') ? $request->target_id : null,
             ]);
             // Mengembalikan respons JSON sukses
-            return response()->json(['success' => true, 'message' => 'File uploaded successfully']);
+            return redirect('/superadmin/Files')->with('success', 'File uploaded successfully');
         } catch (\Exception $e) {
             // Mengembalikan respons JSON dengan pesan kesalahan
             return response()->json(['success' => false, 'message' => 'File upload failed. ' . $e->getMessage()]);

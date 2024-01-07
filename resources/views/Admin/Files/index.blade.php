@@ -127,7 +127,7 @@
                         alert(data.message);
 
                         if (data.success) {
-                            location.reload();
+                            window.location.href = data.redirect;
                             // Jika sukses, reload tabel atau lakukan hal lain yang diinginkan
                             // Misalnya: document.querySelector('#users-table').DataTable().ajax.reload();
                         }
