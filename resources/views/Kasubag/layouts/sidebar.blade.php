@@ -34,15 +34,15 @@
 
             <!-- Nav Item - Pages Collapse Menu -->
             <li class="nav-item">
-                <a class="nav-link" href="{{ url('/superadmin/users') }}">
+                <a class="nav-link" href="{{ url('/kasubag/Rekap_absensi') }}">
                     <i class="fas fa-fw fa-exclamation-triangle"></i>
-                    <span>User</span></a>
+                    <span>Absensi</span></a>
             </li>
 
             <li class="nav-item">
-                <a class="nav-link" href="{{ url('/superadmin/Files') }}">
+                <a class="nav-link" href="#">
                     <i class="fas fa-fw fa-check"></i>
-                    <span>Files</span></a>
+                    <span>Answer Complaints</span></a>
             </li>
             <!-- Tambahkan tautan "Logout" di luar div dengan class "collapse" -->
             <li class="nav-item">

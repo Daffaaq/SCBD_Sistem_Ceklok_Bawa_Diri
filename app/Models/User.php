@@ -25,7 +25,7 @@ class User extends Authenticatable
         'no_telp',
         'jabatan',
     ];
-
+    
     /**
      * The attributes that should be hidden for serialization.
      *

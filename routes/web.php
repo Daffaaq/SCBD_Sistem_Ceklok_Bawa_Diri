@@ -3,6 +3,9 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\DashboardAdminController;
 use App\Http\Controllers\DashboardPegawaiController;
+use App\Http\Controllers\DashboardKasubagController;
+use App\Http\Controllers\FileController;
+use App\Http\Controllers\KasubagAttendence;
 use App\Http\Controllers\AttendenceController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Auth;
@@ -37,6 +40,12 @@ Route::middleware(['auth', 'check.role:superadmin'])->prefix('superadmin')->grou
         Route::delete('/users/delete/{id}', [UserController::class, 'destroy']);
         Route::get('/users/data', [UserController::class, 'getUsersData'])->name('users.data');
     });
+    Route::prefix('/')->group(function () {
+        Route::get('/Files', [FileController::class, 'index']);
+        Route::post('/Files/store', [FileController::class, 'store']);
+        Route::get('/Files/json', [FileController::class, 'json'])->name('files.json');
+        Route::get('/Files/private/files/{id}', [FileController::class, 'serveFile'])->name('files.serve');
+    });
 });
 Route::middleware(['auth', 'check.role:pegawai'])->prefix('pegawai')->group(function () {
     Route::get('/', [DashboardPegawaiController::class, 'ViewPegawai'])->name('pegawai.dashboard');
@@ -48,5 +57,15 @@ Route::middleware(['auth', 'check.role:pegawai'])->prefix('pegawai')->group(func
         Route::get('/rekap', [AttendenceController::class, 'recapAttendence']);
         Route::get('/rekap/data', [AttendenceController::class, 'getRecapAttendence'])->name('get.recap.attendance');
         Route::delete('/rekap/delete/{id}', [AttendenceController::class, 'destroy']);
+    });
+});
+
+Route::middleware(['auth', 'check.role:kasubag'])->prefix('kasubag')->group(function () {
+    Route::get('/', [DashboardKasubagController::class, 'ViewKasubag'])->name('kasubag.dashboard');
+    Route::prefix('/')->group(function () {
+        Route::get('/Rekap_absensi', [KasubagAttendence::class, 'index']);
+        Route::get('/Rekap_absensi/data', [KasubagAttendence::class, 'json'])->name('get.recap.attendance.kasubag');
+        Route::get('/accept/{id}', [KasubagAttendence::class, 'acceptAttendance'])->name('attendances.accept');
+        Route::get('/reject/{id}', [KasubagAttendence::class, 'rejectAttendance'])->name('attendances.reject');
     });
 });
