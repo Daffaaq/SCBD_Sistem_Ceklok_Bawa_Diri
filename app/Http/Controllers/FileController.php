@@ -7,6 +7,7 @@ use Yajra\DataTables\DataTables;
 use Illuminate\Support\Facades\Storage;
 use App\Models\User;
 use App\Models\file;
+use App\Models\attendence;
 use Illuminate\Support\Facades\Auth;
 
 class FileController extends Controller
@@ -21,35 +22,63 @@ class FileController extends Controller
         return view('Admin.Files.index', compact('jabatans'));
     }
     public function indexPegawai(Request $request)
-{
-    // Ambil data jabatan dari tabel user dengan role selain superadmin
-    $jabatans = User::where('role', '!=', 'superadmin')
-        ->select('jabatan')
-        ->distinct()
-        ->get();
+    {
+        // Ambil data jabatan dari tabel user dengan role selain superadmin
+        $jabatans = User::where('role', '!=', 'superadmin')
+            ->select('jabatan')
+            ->distinct()
+            ->get();
 
-    // Identifikasi pengguna yang sedang login
-    $loggedInUser = Auth::user();
+        // Identifikasi pengguna yang sedang login
+        $loggedInUser = Auth::user();
 
-    // Ambil daftar file sesuai dengan jabatan pengguna yang sedang login
-    $files = File::when($request->input('target_type') === 'specific', function ($query) use ($request) {
-    return $query->where('target_id', $request->input('target_id'));
-    })->when($request->input('target_type') === 'general', function ($query) use ($loggedInUser) {
-    return $query->where('target_type', 'general')
-        ->orWhere(function ($query) use ($loggedInUser) {
-            $query->where('target_type', 'specific')
-                ->where('target_id', $loggedInUser->jabatan);
+        // Ambil daftar file sesuai dengan jabatan pengguna yang sedang login
+        $files = File::when($request->input('target_type') === 'specific', function ($query) use ($request) {
+        return $query->where('target_id', $request->input('target_id'));
+        })->when($request->input('target_type') === 'general', function ($query) use ($loggedInUser) {
+        return $query->where('target_type', 'general')
+            ->orWhere(function ($query) use ($loggedInUser) {
+                $query->where('target_type', 'specific')
+                    ->where('target_id', $loggedInUser->jabatan);
+            });
+        })->get();
+
+
+        $filteredFiles = $files->filter(function ($file) use ($loggedInUser) {
+        return $file->target_type == 'general' || ($file->target_type == 'specific' && $file->target_id == $loggedInUser->jabatan);
         });
-    })->get();
+        return view('Pegawai.Dashboard.index', compact('jabatans', 'filteredFiles'));
+    }
+    public function indexKasubag(Request $request)
+    {
+        $totalAbsences = attendence::count();
+        $totalPegawai = User::where('role', 'pegawai')->count();
+        // Ambil data jabatan dari tabel user dengan role selain superadmin
+        $jabatans = User::where('role', '!=', 'superadmin')
+            ->select('jabatan')
+            ->distinct()
+            ->get();
+
+        // Identifikasi pengguna yang sedang login
+        $loggedInUser = Auth::user();
+
+        // Ambil daftar file sesuai dengan jabatan pengguna yang sedang login
+        $files = File::when($request->input('target_type') === 'specific', function ($query) use ($request) {
+        return $query->where('target_id', $request->input('target_id'));
+        })->when($request->input('target_type') === 'general', function ($query) use ($loggedInUser) {
+        return $query->where('target_type', 'general')
+            ->orWhere(function ($query) use ($loggedInUser) {
+                $query->where('target_type', 'specific')
+                    ->where('target_id', $loggedInUser->jabatan);
+            });
+        })->get();
 
 
-    $filteredFiles = $files->filter(function ($file) use ($loggedInUser) {
-    return $file->target_type == 'general' || ($file->target_type == 'specific' && $file->target_id == $loggedInUser->jabatan);
-});
-
-
-    return view('Pegawai.Dashboard.index', compact('jabatans', 'filteredFiles'));
-}
+        $filteredFiles = $files->filter(function ($file) use ($loggedInUser) {
+        return $file->target_type == 'general' || ($file->target_type == 'specific' && $file->target_id == $loggedInUser->jabatan);
+        });
+        return view('Kasubag.Dashboard.index', compact('jabatans', 'filteredFiles','totalAbsences','totalPegawai'));
+    }
 
 
     public function json(){

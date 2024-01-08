@@ -11,7 +11,7 @@
                 <div class="sidebar-brand-icon rotate-n-15">
                     <i class="fas fa-laugh-wink"></i>
                 </div>
-                <div class="sidebar-brand-text mx-3">SIPMA</div>
+                <div class="sidebar-brand-text mx-3">SCBD</div>
             </a>
 
             <!-- Divider -->
@@ -19,7 +19,7 @@
 
             <!-- Nav Item - Dashboard -->
             <li class="nav-item active">
-                <a class="nav-link" href="#">
+                <a class="nav-link" href="{{ route('kasubag.dashboard') }}">
                     <i class="fas fa-fw fa-tachometer-alt"></i>
                     <span>Dashboard</span></a>
             </li>
@@ -37,12 +37,6 @@
                 <a class="nav-link" href="{{ url('/kasubag/Rekap_absensi') }}">
                     <i class="fas fa-fw fa-exclamation-triangle"></i>
                     <span>Absensi</span></a>
-            </li>
-
-            <li class="nav-item">
-                <a class="nav-link" href="#">
-                    <i class="fas fa-fw fa-check"></i>
-                    <span>Answer Complaints</span></a>
             </li>
             <!-- Tambahkan tautan "Logout" di luar div dengan class "collapse" -->
             <li class="nav-item">

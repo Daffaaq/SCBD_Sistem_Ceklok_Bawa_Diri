@@ -1,4 +1,4 @@
-@extends('Pegawai.layouts.index')
+@extends('Kasubag.layouts.index')
 
 @section('container')
     @foreach ($pegawaiUsers as $pegawaiUser)

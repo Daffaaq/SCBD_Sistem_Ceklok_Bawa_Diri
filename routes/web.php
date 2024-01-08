@@ -68,7 +68,8 @@ Route::middleware(['auth', 'check.role:pegawai'])->prefix('pegawai')->group(func
 });
 
 Route::middleware(['auth', 'check.role:kasubag'])->prefix('kasubag')->group(function () {
-    Route::get('/', [DashboardKasubagController::class, 'ViewKasubag'])->name('kasubag.dashboard');
+    // Route::get('/', [DashboardKasubagController::class, 'ViewKasubag'])->name('kasubag.dashboard');
+    Route::get('/', [FileController::class, 'indexKasubag'])->name('kasubag.dashboard');
     Route::prefix('/')->group(function () {
         Route::get('/Rekap_absensi', [KasubagAttendence::class, 'index']);
         Route::get('/Rekap_absensi/data', [KasubagAttendence::class, 'json'])->name('get.recap.attendance.kasubag');
