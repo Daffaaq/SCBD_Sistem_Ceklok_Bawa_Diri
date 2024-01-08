@@ -31,6 +31,7 @@ Auth::routes();
 
 Route::middleware(['auth', 'check.role:superadmin'])->prefix('superadmin')->group(function () {
     Route::get('/', [DashboardAdminController::class, 'viewAdmin'])->name('superadmin.dashboard');
+    Route::get('/Profiles', [DashboardAdminController::class, 'Profiles'])->name('superadmin.profiles');
     Route::prefix('/')->group(function () {
         Route::get('/users', [UserController::class, 'index']);
         Route::get('/users/create', [UserController::class, 'create']);
@@ -53,6 +54,7 @@ Route::middleware(['auth', 'check.role:superadmin'])->prefix('superadmin')->grou
 Route::middleware(['auth', 'check.role:pegawai'])->prefix('pegawai')->group(function () {
     // Route::get('/', [DashboardPegawaiController::class, 'ViewPegawai'])->name('pegawai.dashboard');
     Route::get('/', [FileController::class, 'indexPegawai'])->name('pegawai.dashboard');
+    Route::get('/Profiles', [DashboardPegawaiController::class, 'Profiles'])->name('pegawai.profiles');
     Route::prefix('/')->group(function () {
         Route::get('/absensi', [AttendenceController::class, 'index']);
         Route::post('/absensi/store', [AttendenceController::class, 'store']);
@@ -70,6 +72,7 @@ Route::middleware(['auth', 'check.role:pegawai'])->prefix('pegawai')->group(func
 Route::middleware(['auth', 'check.role:kasubag'])->prefix('kasubag')->group(function () {
     // Route::get('/', [DashboardKasubagController::class, 'ViewKasubag'])->name('kasubag.dashboard');
     Route::get('/', [FileController::class, 'indexKasubag'])->name('kasubag.dashboard');
+    Route::get('/Profiles', [DashboardKasubagController::class, 'Profiles'])->name('kasubag.profiles');
     Route::prefix('/')->group(function () {
         Route::get('/Rekap_absensi', [KasubagAttendence::class, 'index']);
         Route::get('/Rekap_absensi/data', [KasubagAttendence::class, 'json'])->name('get.recap.attendance.kasubag');

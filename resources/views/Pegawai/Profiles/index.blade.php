@@ -1,4 +1,4 @@
-@extends('Admin.layouts.index')
+@extends('Kasubag.layouts.index')
 
 @section('container')
 
@@ -60,7 +60,7 @@
                         </div>
                         <div class="row mt-3">
                             <div class="col-md-12">
-                                <a href="{{ route('superadmin.dashboard') }}" class="btn btn-secondary">Back</a>
+                                <a href="{{ route('pegawai.dashboard') }}" class="btn btn-secondary">Back</a>
                             </div>
                         </div>
                     </div>
