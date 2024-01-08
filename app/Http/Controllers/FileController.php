@@ -34,13 +34,13 @@ class FileController extends Controller
     // Ambil daftar file sesuai dengan jabatan pengguna yang sedang login
     $files = File::when($request->input('target_type') === 'specific', function ($query) use ($request) {
     return $query->where('target_id', $request->input('target_id'));
-})->when($request->input('target_type') === 'general', function ($query) use ($loggedInUser) {
+    })->when($request->input('target_type') === 'general', function ($query) use ($loggedInUser) {
     return $query->where('target_type', 'general')
         ->orWhere(function ($query) use ($loggedInUser) {
             $query->where('target_type', 'specific')
                 ->where('target_id', $loggedInUser->jabatan);
         });
-})->get();
+    })->get();
 
 
     $filteredFiles = $files->filter(function ($file) use ($loggedInUser) {
@@ -57,8 +57,6 @@ class FileController extends Controller
 
         return DataTables::of($files)
             ->addColumn('action', function ($file) {
-                // Tambahkan aksi atau tombol aksi yang diinginkan di sini
-                return '<button class="btn btn-sm btn-danger delete-file" data-id="' . $file->id . '">Delete</button>';
             })
             ->rawColumns(['action'])
             ->make(true);
@@ -95,6 +93,74 @@ $path = $file->storeAs('private/files', $fileName, 'local');
         }
     }
     
+    public function edit($id)
+    {
+        $file = file::findOrFail($id);
+        $jabatans = User::where('role', '!=', 'superadmin')
+                    ->select('jabatan')
+                    ->distinct()
+                    ->get(); // Ambil data jabatan dari tabel user dengan role selain superadmin
+        return view('Admin.Files.edit', compact('file','jabatans'));
+        // return response()->json(['success' => true, 'file' => $file]);
+    }
+
+public function update(Request $request, $id)
+{
+    try {
+        $file = File::findOrFail($id);
+
+        $request->validate([
+            'criteria_file' => 'required',
+            'file' => 'nullable|mimes:pdf,doc,docx|max:10240',
+            // Tambahkan validasi lain sesuai kebutuhan
+        ]);
+
+        // Update atribut file yang diperlukan
+        $file->criteria_file = $request->criteria_file;
+
+        // Cek apakah ada file baru diunggah
+        if ($request->hasFile('file')) {
+            $newFile = $request->file('file');
+            $newFileName = $newFile->getClientOriginalName();
+            $newFilePath = $newFile->storeAs('private/files', $newFileName, 'local');
+
+            // Hapus file lama jika ada
+            Storage::disk('local')->delete($file->path);
+
+            // Update informasi file baru
+            $file->name = $newFileName;
+            $file->path = $newFilePath;
+        }
+
+        // Update atribut tambahan
+        $file->file_date_created = now()->toDateString();
+        $file->file_time_created = now()->toTimeString();
+        $file->target_type = $request->input('target_type');
+        $file->target_id = ($request->target_type === 'specific') ? $request->target_id : null;
+
+        // Simpan perubahan
+        $file->save();
+        return redirect('/superadmin/Files')->with('success', 'File updated successfully');
+    //    return response()->json(['success' => true, 'message' => 'File updated successfully', 'redirect' => url('/superadmin/Files')]);
+    } catch (\Exception $e) {
+        return response()->json(['success' => false, 'message' => 'File update failed. ' . $e->getMessage()]);
+    }
+}
+
+
+    public function deleteFile($id)
+{
+    try {
+        $file = File::findOrFail($id);
+        $file->delete();
+
+        return response()->json(['success' => true, 'message' => 'File deleted successfully']);
+    } catch (\Exception $e) {
+        return response()->json(['success' => false, 'message' => 'File deletion failed. ' . $e->getMessage()]);
+    }
+}
+
+
     public function serveFile($id)
     {
         $file = File::findOrFail($id);

@@ -44,6 +44,9 @@ Route::middleware(['auth', 'check.role:superadmin'])->prefix('superadmin')->grou
         Route::get('/Files', [FileController::class, 'index']);
         Route::post('/Files/store', [FileController::class, 'store']);
         Route::get('/Files/json', [FileController::class, 'json'])->name('files.json');
+        Route::delete('/Files/private/files/delete/{id}', [FileController::class, 'deleteFile'])->name('files.delete');
+        Route::get('/Files/edit/{id}', [FileController::class, 'edit']);
+        Route::put('/Files/update/{id}', [FileController::class, 'update']);
         Route::get('/Files/private/files/{id}', [FileController::class, 'serveFile'])->name('files.serve');
     });
 });

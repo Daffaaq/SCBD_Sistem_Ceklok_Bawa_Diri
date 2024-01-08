@@ -54,6 +54,51 @@
             </div>
         </div>
     </div>
+    <div class="modal fade" id="editFileModal" tabindex="-1" role="dialog" aria-labelledby="editFileModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editFileModalLabel">Edit File</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="editFileForm" enctype="multipart/form-data">
+                        @csrf
+                        <div class="form-group">
+                            <label for="edit_criteria_file">Kriteria File:</label>
+                            <input type="text" id="edit_criteria_file" name="criteria_file" class="form-control"
+                                required>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit_file">File:</label>
+                            <input type="file" id="edit_file" name="file" class="form-control-file">
+                        </div>
+                        <div class="form-group">
+                            <label for="criteria_file">Tujuan:</label>
+                            <select name="target_type" class="form-control" required>
+                                <option value="general">Umum</option>
+                                <option value="specific">Khusus</option>
+                            </select>
+                        </div>
+                        <div class="form-group specific-target-modal" style="display: none;">
+                            <label for="specific_target">Jabatan:</label>
+                            <select name="target_id" class="form-control">
+                                @foreach ($jabatans as $jabatan)
+                                    <option value="{{ $jabatan->jabatan }}">{{ $jabatan->jabatan }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <!-- Tambahkan input lain sesuai kebutuhan -->
+                        <input type="hidden" id="edit_file_id" name="file_id">
+                        <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
     <script>
         var fileDetailsUrl = "{{ url('superadmin/Files/private/files') }}"; // Update the URL
         $(document).ready(function() {
@@ -85,7 +130,13 @@
                         data: 'action',
                         name: 'action',
                         orderable: false,
-                        searchable: false
+                        searchable: false,
+                        render: function(data, type, row) {
+                            return '<button class="btn btn-sm btn-danger delete-file" data-id="' +
+                                row.id + '">Delete</button>' +
+                                ' <button class="btn btn-sm btn-primary edit-file" data-id="' +
+                                row.id + '">Edit</button>';
+                        }
                     },
                 ]
             });
@@ -97,12 +148,49 @@
                 // You might want to open the file in a new tab/window
                 window.open(fileDetailsUrl + '/' + fileId);
             });
+            // Tambahkan script untuk menangani klik tombol Edit
+            $('#files-table').on('click', '.edit-file', function(e) {
+                e.preventDefault();
+                var fileId = $(this).data('id');
+
+                // Arahkan pengguna ke halaman edit
+                window.location.href = "{{ url('/superadmin/Files/edit') }}" + '/' + fileId;
+            });
+        });
+
+        $('#files-table').on('click', '.delete-file', function() {
+            var fileId = $(this).data('id');
+
+            if (confirm('Apakah Anda yakin ingin menghapus file ini?')) {
+                // Ambil token CSRF dari meta tag
+                var csrfToken = $('meta[name="csrf-token"]').attr('content');
+
+                // Kirim permintaan penghapusan ke server
+                $.ajax({
+                    url: fileDetailsUrl + '/delete/' + fileId,
+                    type: 'DELETE',
+                    headers: {
+                        'X-CSRF-TOKEN': csrfToken // Sertakan token CSRF dalam header
+                    },
+                    success: function(data) {
+                        alert(data.message);
+
+                        if (data.success) {
+                            // Muat ulang tabel setelah penghapusan berhasil
+                            $('#files-table').DataTable().ajax.reload();
+                        }
+                    },
+                    error: function(error) {
+                        console.error('Error:', error);
+                        alert('File deletion failed. Please try again.');
+                    }
+                });
+            }
         });
 
         document.addEventListener("DOMContentLoaded", function() {
             var targetSelect = document.querySelector('select[name="target_type"]');
             var specificTargetDiv = document.getElementById('specific_target');
-
             targetSelect.addEventListener('change', function() {
                 if (this.value === 'specific') {
                     specificTargetDiv.style.display = 'block';
