@@ -75,7 +75,7 @@ Route::middleware(['auth', 'check.role:kasubag'])->prefix('kasubag')->group(func
     Route::get('/Profiles', [DashboardKasubagController::class, 'Profiles'])->name('kasubag.profiles');
     Route::prefix('/')->group(function () {
         Route::get('/Rekap_absensi', [KasubagAttendence::class, 'index']);
-        Route::get('/Rekap_absensi/data', [KasubagAttendence::class, 'json'])->name('get.recap.attendance.kasubag');
+        Route::get('/Rekap_absensi/data/{userId}', [KasubagAttendence::class, 'json'])->name('get.recap.attendance.kasubag');
         Route::get('/accept/{id}', [KasubagAttendence::class, 'acceptAttendance'])->name('attendances.accept');
         Route::get('/reject/{id}', [KasubagAttendence::class, 'rejectAttendance'])->name('attendances.reject');
     });

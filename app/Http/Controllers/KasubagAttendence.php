@@ -9,10 +9,9 @@ use Illuminate\Support\Facades\DB;
 
 class KasubagAttendence extends Controller
 {
-    public function json()
+    public function json($userId)
     {
-        $attendances = Attendence::leftJoin('users', 'attendences.user_id', '=', 'users.id')
-            ->where('users.role', 'pegawai')
+        $attendances = Attendence::where('user_id', $userId)
             ->select([
                 'attendences.id',
                 'attendences.attendences_time',
@@ -29,6 +28,7 @@ class KasubagAttendence extends Controller
             })
             ->make(true);
     }
+
     public function index()
     {
         // Ambil semua user yang memiliki role 'pegawai'

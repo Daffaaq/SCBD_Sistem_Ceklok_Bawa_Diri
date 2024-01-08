@@ -8,8 +8,7 @@
             </div>
             <div class="card-body">
                 <div class="table-responsive">
-                    <table class="table table-bordered" id="{{ 'users-table-' . $pegawaiUser->id }}" width="100%"
-                        cellspacing="0">
+                    <table class="table table-bordered" id="user-table-{{ $pegawaiUser->id }}" width="100%" cellspacing="0">
                         <thead>
                             <tr>
                                 <th>Waktu Absensi</th>
@@ -25,10 +24,9 @@
                 </div>
             </div>
         </div>
-
         <script>
             $(document).ready(function() {
-                $('#{{ 'users-table-' . $pegawaiUser->id }}').DataTable({
+                $('#user-table-{{ $pegawaiUser->id }}').DataTable({
                     processing: true,
                     serverSide: true,
                     ajax: "{{ route('get.recap.attendance.kasubag', ['userId' => $pegawaiUser->id]) }}",
@@ -72,7 +70,7 @@
                     success: function(data) {
                         alert(data.message);
                         location.reload();
-                        $('#users-table-' + id).DataTable().ajax.reload();
+                        $('#user-table-' + id).DataTable().ajax.reload();
                         // You may need to reload or update the DataTable after accepting attendance
                     },
                     error: function(xhr, status, error) {
@@ -89,7 +87,7 @@
                     success: function(data) {
                         alert(data.message);
                         location.reload();
-                        $('#users-table-' + id).DataTable().ajax.reload();
+                        $('#user-table-' + id).DataTable().ajax.reload();
                         // You may need to reload or update the DataTable after rejecting attendance
                     },
                     error: function(xhr, status, error) {
